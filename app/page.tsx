@@ -9,6 +9,7 @@ export default class page extends Component {
       <div>
         <Navbar />
         <News />
+        
       </div>
     )
   }
