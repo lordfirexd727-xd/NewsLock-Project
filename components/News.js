@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import NewsItem from "../components/NewsItem";
+import Spinner from "./Spiner";
+
 
 export class News extends Component {
   constructor() {
@@ -7,16 +9,18 @@ export class News extends Component {
 
  this.state = {
   articles: [],
-  loading: false,
+  loading: true,
   page: 1,
   totalResults: 0,
-  pageSize: 10
+  pageSize: 6
 };
   }
+  
 
   async componentDidMount() {
     let url =
       `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=5e24d783d69b4823b913b256d5c65e30&pageSize=${this.state.pageSize}`;
+       this.setState({ loading: true });
 
     let data = await fetch(url);
     let passeddata = await data.json();
@@ -25,7 +29,8 @@ export class News extends Component {
 
     this.setState({
     articles: passeddata.articles || [],
-    totalResults: passeddata.totalResults || 0
+    totalResults: passeddata.totalResults || 0,
+    loading: false
 });
   }
 
@@ -35,6 +40,7 @@ handleprevclick = async () => {
   let nextPage = this.state.page - 1;
 
   let url = `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=5e24d783d69b4823b913b256d5c65e30&page=${nextPage}&pageSize=${this.state.pageSize}`;
+   this.setState({ loading: true });
 
   console.log("Previous URL:", url);
 
@@ -46,7 +52,8 @@ handleprevclick = async () => {
     this.setState({
     page: nextPage,
     articles: passeddata.articles || [],
-    totalResults: passeddata.totalResults || 0
+    totalResults: passeddata.totalResults || 0,
+    loading: false
 });
 };
 
@@ -55,14 +62,14 @@ handlenextclick = async () => {
 
   let nextPage = this.state.page + 1;
 
-  let url = `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=5e24d783d69b4823b913b256d5c65e30&page=${nextPage}&pageSize=6`;
-
+  let url = `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=5e24d783d69b4823b913b256d5c65e30&page=${nextPage}&pageSize=${this.state.pageSize}`;
+  this.setState({ loading: true });
   console.log("Next URL:", url);
 
   let data = await fetch(url);
   let passeddata = await data.json();
 
-  console.log("Next response:", passeddata);
+   this.setState({ loading: false });
 
     this.setState({
     page: nextPage,
@@ -78,10 +85,11 @@ let maxPage = Math.ceil(
     return (
       <div className="container my-2">
         <h1 className="text-center">NewsLock - Top Headlines</h1>
+        {this.state.loading && <Spinner />}
         
 
         <div className="row">
-          {this.state.articles.map((element) => {
+          {!this.state.loading && this.state.articles.map((element) => {
             return (
               <div className="col-md-4" key={element.url}>
                 <NewsItem
@@ -108,9 +116,7 @@ let maxPage = Math.ceil(
   Page {this.state.page} / {maxPage}
 </span>
          <button
-  disabled={
-    this.state.page >= Math.ceil(this.state.totalResults / 10)
-  }
+ disabled={this.state.page >= maxPage}
   type="button"
   className="btn btn-dark"
   onClick={this.handlenextclick}
