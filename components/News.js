@@ -1,9 +1,24 @@
+"use client";
 import React, { Component } from "react";
 import NewsItem from "../components/NewsItem";
 import Spinner from "./Spiner";
+import PropTypes from 'prop-types'
+
 
 
 export class News extends Component {
+  static defaultProps = {
+    country: "in",
+    pageSize: 6,
+    category: "sports"
+  };
+  
+  static propTypes = {
+    country: PropTypes.string,
+    pageSize: PropTypes.number,
+    category: PropTypes.string,
+  };
+  
   constructor() {
     super();
 
@@ -19,7 +34,7 @@ export class News extends Component {
 
   async componentDidMount() {
     let url =
-      `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=5e24d783d69b4823b913b256d5c65e30&pageSize=${this.state.pageSize}`;
+      `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=5e24d783d69b4823b913b256d5c65e30&pageSize=${this.state.pageSize}`;
        this.setState({ loading: true });
 
     let data = await fetch(url);
@@ -39,7 +54,7 @@ handleprevclick = async () => {
 
   let nextPage = this.state.page - 1;
 
-  let url = `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=5e24d783d69b4823b913b256d5c65e30&page=${nextPage}&pageSize=${this.state.pageSize}`;
+  let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=5e24d783d69b4823b913b256d5c65e30&page=${nextPage}&pageSize=${this.state.pageSize}`;
    this.setState({ loading: true });
 
   console.log("Previous URL:", url);
@@ -62,7 +77,7 @@ handlenextclick = async () => {
 
   let nextPage = this.state.page + 1;
 
-  let url = `https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=5e24d783d69b4823b913b256d5c65e30&page=${nextPage}&pageSize=${this.state.pageSize}`;
+  let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=5e24d783d69b4823b913b256d5c65e30&page=${nextPage}&pageSize=${this.state.pageSize}`;
   this.setState({ loading: true });
   console.log("Next URL:", url);
 
