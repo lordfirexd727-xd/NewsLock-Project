@@ -108,10 +108,13 @@ let maxPage = Math.ceil(
             return (
               <div className="col-md-4" key={element.url}>
                 <NewsItem
-                  title={element.title?.slice(0, 45)}
+                  title={element.title?.slice(0, 45) } 
                   description={element.description?.slice(0, 88)}
                   imageurl={element.urlToImage}
                   Newsurl={element.url}
+                  author={element.author || "Unknown"}
+                  date={element.publishedAt.slice(0, 10)}
+                  category={this.props.category}
                 />
               </div>
             );
