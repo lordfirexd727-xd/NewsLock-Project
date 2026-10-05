@@ -3,13 +3,14 @@ import React, { Component } from 'react'
 import Navbar from '../components/Navbar'
 import News from '../components/News'
 
+const pagesize = 8;
 
 export default class page extends Component {
   render() {
     return (
       <div>
         <Navbar />
-        <News pageSize={9} country="us" category="sports" />
+        <News pageSize={pagesize} country="us" category="sports" />
         
       </div>
     )

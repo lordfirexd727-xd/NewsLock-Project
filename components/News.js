@@ -27,14 +27,13 @@ export class News extends Component {
   loading: true,
   page: 1,
   totalResults: 0,
-  pageSize: 6
+  pageSize: 8
 };
   }
   
-
-  async componentDidMount() {
-    let url =
-      `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=5e24d783d69b4823b913b256d5c65e30&pageSize=${this.state.pageSize}`;
+ async updateNews(pageNo) {
+   const url =
+      `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=5e24d783d69b4823b913b256d5c65e30&page=${pageNo}&pageSize=${this.state.pageSize}`;
        this.setState({ loading: true });
 
     let data = await fetch(url);
@@ -46,51 +45,25 @@ export class News extends Component {
     articles: passeddata.articles || [],
     totalResults: passeddata.totalResults || 0,
     loading: false
-});
+ }
+);
+  };
+
+  async componentDidMount() {
+    this.updateNews(this.state.page);
   }
 
 handleprevclick = async () => {
-  console.log("Current page:", this.state.page);
 
-  let nextPage = this.state.page - 1;
+this.setState({page: this.state.page - 1});
+   this.updateNews();
 
-  let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=5e24d783d69b4823b913b256d5c65e30&page=${nextPage}&pageSize=${this.state.pageSize}`;
-   this.setState({ loading: true });
-
-  console.log("Previous URL:", url);
-
-  let data = await fetch(url);
-  let passeddata = await data.json();
-
-  console.log("Previous response:", passeddata);
-
-    this.setState({
-    page: nextPage,
-    articles: passeddata.articles || [],
-    totalResults: passeddata.totalResults || 0,
-    loading: false
-});
 };
 
 handlenextclick = async () => {
-  console.log("Current page:", this.state.page);
+this.setState({page: this.state.page + 1});
+   this.updateNews();
 
-  let nextPage = this.state.page + 1;
-
-  let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=5e24d783d69b4823b913b256d5c65e30&page=${nextPage}&pageSize=${this.state.pageSize}`;
-  this.setState({ loading: true });
-  console.log("Next URL:", url);
-
-  let data = await fetch(url);
-  let passeddata = await data.json();
-
-   this.setState({ loading: false });
-
-    this.setState({
-    page: nextPage,
-    articles: passeddata.articles || [],
-    totalResults: passeddata.totalResults || 0
-});
 };
 
   render() {
