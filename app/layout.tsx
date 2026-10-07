@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Newslock - daily news ",
+  title: "",
   description: "NEWSLOCK is a modern news platform that brings the latest news and trending stories together in one place. Stay informed, explore different categories, and keep up with what's happening around the world. 🔒📰",
 };
 
