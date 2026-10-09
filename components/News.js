@@ -5,6 +5,7 @@ import NewsItem from "../components/NewsItem";
 import Spinner from "./Spiner";
 import PropTypes from "prop-types";
 
+
 export class News extends Component {
   static defaultProps = {
     country: "in",
@@ -44,6 +45,8 @@ export class News extends Component {
   };
 
   async updateNews(pageNo, append = false) {
+    console.log(this.props);
+   this.props.setProgress(10);
     const url =
       `https://newsapi.org/v2/top-headlines?country=${this.props.country}` +
       `&category=${this.props.category}` +
@@ -56,7 +59,9 @@ export class News extends Component {
     }
 
     const data = await fetch(url);
+     this.props.setProgress(30);
     const passeddata = await data.json();
+    this.props.setProgress(70);
 
     console.log(passeddata);
 
@@ -68,6 +73,7 @@ export class News extends Component {
       loading: false,
       loadingMore: false,
     });
+    this.props.setProgress(100);
   }
 
   async componentDidMount() {
@@ -167,6 +173,12 @@ export class News extends Component {
       </div>
     );
   }
+  static propTypes = {
+  country: PropTypes.string,
+  pageSize: PropTypes.number,
+  category: PropTypes.string,
+  setProgress: PropTypes.func,
+};
 }
 
 export default News;
