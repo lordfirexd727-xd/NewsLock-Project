@@ -13,6 +13,7 @@ export default function CategoryPage({
   const { category } = use(params);
 
   const [progress, setProgress] = useState(0);
+  
 
   return (
     <>

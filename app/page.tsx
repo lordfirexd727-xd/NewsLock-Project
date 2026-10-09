@@ -10,9 +10,11 @@ export default class page extends Component {
 state = {
   progress: 0
 };
+
 Setprogress = (progress: number) => {
   this.setState({ progress: progress })
 }
+
   render() {
     return (
       <div>
@@ -22,7 +24,7 @@ Setprogress = (progress: number) => {
   color="#000000"
   progress={this.state.progress}
 />
-        <News pageSize={pagesize} country="us" category="sports"  setProgress={this.Setprogress} />
+        <News pageSize={pagesize} country="us" category="sports"  setProgress={this.Setprogress}  />
         
       </div>
     )

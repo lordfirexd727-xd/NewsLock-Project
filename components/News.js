@@ -47,13 +47,12 @@ export class News extends Component {
   async updateNews(pageNo, append = false) {
     console.log(this.props);
    this.props.setProgress(10);
-    const url =
-      `https://newsapi.org/v2/top-headlines?country=${this.props.country}` +
-      `&category=${this.props.category}` +
-      `&apiKey=5e24d783d69b4823b913b256d5c65e30` +
-      `&page=${pageNo}` +
-      `&pageSize=${this.state.pageSize}`;
-
+const url =
+  `/api/news?country=${this.props.country}` +
+  `&category=${this.props.category}` +
+  `&page=${pageNo}` +
+  `&pageSize=${this.state.pageSize}`;
+  
     if (!append) {
       this.setState({ loading: true });
     }
