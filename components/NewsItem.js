@@ -1,8 +1,7 @@
-import React, { Component } from "react";
+import React from "react";
 
-export class NewsItem extends Component {
-  render() {
-    let { title, description, imageurl, Newsurl , author , date } = this.props;
+ const NewsItem = (props) => {
+  let { title, description, imageurl, Newsurl , author , date } = props;
 
     let defaultImage = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ62mZn-g_FDVhNAYwqwPoESQG3SPPdwb3tqGphpeBmbQ&s=10";
 
@@ -21,7 +20,7 @@ export class NewsItem extends Component {
 
           <div className="card-body">
             <h5 className="card-title">{title}  <span className="badge text-bg-primary ms-2">
-              {this.props.category}
+              {props.category}
       </span>  
       <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
         99+
@@ -47,6 +46,6 @@ export class NewsItem extends Component {
       </div>
     );
   }
-}
+
 
 export default NewsItem;

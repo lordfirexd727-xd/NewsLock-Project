@@ -1,183 +1,164 @@
+
 "use client";
 
-import React, { Component } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import NewsItem from "../components/NewsItem";
 import Spinner from "./Spiner";
-import PropTypes from "prop-types";
 
+const News = ({
+  country = "in",
+  pageSize = 6,
+  category = "sports",
+  setProgress,
+}) => {
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
 
-export class News extends Component {
-  static defaultProps = {
-    country: "in",
-    pageSize: 6,
-    category: "sports",
-  };
+  const updateNews = useCallback(
+    async (pageNo, append = false) => {
+      if (!append) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
 
-  static propTypes = {
-    country: PropTypes.string,
-    pageSize: PropTypes.number,
-    category: PropTypes.string,
-  };
+      setProgress?.(10);
 
-  constructor(props) {
-    super(props);
+      try {
+        const url =
+          `/api/news?country=${country}` +
+          `&category=${category}` +
+          `&page=${pageNo}` +
+          `&pageSize=${pageSize}`;
 
-    this.state = {
-      articles: [],
-      loading: true,
-      loadingMore: false,
-      page: 1,
-      totalResults: 0,
-      pageSize: 8,
+        const response = await fetch(url);
+        setProgress?.(30);
+
+        const data = await response.json();
+        setProgress?.(70);
+
+        if (!response.ok || data.status === "error") {
+          throw new Error(data.message || "Failed to fetch news");
+        }
+
+        setArticles((previousArticles) => {
+  const newArticles = data.articles || [];
+
+  if (!append) {
+    return newArticles;
+  }
+
+  const uniqueArticles = newArticles.filter(
+    (newArticle) =>
+      !previousArticles.some(
+        (oldArticle) => oldArticle.url === newArticle.url
+      )
+  );
+
+  return [...previousArticles, ...uniqueArticles];
+});
+
+        setTotalResults(data.totalResults || 0);
+        setPage(pageNo);
+      } catch (error) {
+        console.error("News fetch failed:", error);
+
+        if (!append) {
+          setArticles([]);
+          setTotalResults(0);
+        }
+      } finally {
+        setLoading(false);
+        setLoadingMore(false);
+        setProgress?.(100);
+      }
+    },
+    [country, category, pageSize, setProgress]
+  );
+
+  // Initial load and category changes
+  useEffect(() => {
+    document.title =
+      `${category.charAt(0).toUpperCase() + category.slice(1)} - NewsLock`;
+
+    updateNews(1);
+  }, [category, updateNews]);
+
+  const loadMoreNews = useCallback(async () => {
+    const maxPage = Math.ceil(totalResults / pageSize);
+
+    if (loading || loadingMore || page >= maxPage) {
+      return;
+    }
+
+    await updateNews(page + 1, true);
+  }, [
+    loading,
+    loadingMore,
+    page,
+    totalResults,
+    pageSize,
+    updateNews,
+  ]);
+
+  // Infinite scrolling
+  useEffect(() => {
+    const handleScroll = () => {
+      const nearBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 200;
+
+      if (nearBottom) {
+        loadMoreNews();
+      }
     };
-  }
 
-  handleScroll = () => {
-    if (
-      window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - 200 &&
-      !this.state.loadingMore &&
-      this.state.page <
-        Math.ceil(this.state.totalResults / this.state.pageSize)
-    ) {
-      this.loadMoreNews();
-    }
-  };
+    window.addEventListener("scroll", handleScroll);
 
-  async updateNews(pageNo, append = false) {
-    console.log(this.props);
-   this.props.setProgress(10);
-const url =
-  `/api/news?country=${this.props.country}` +
-  `&category=${this.props.category}` +
-  `&page=${pageNo}` +
-  `&pageSize=${this.state.pageSize}`;
-  
-    if (!append) {
-      this.setState({ loading: true });
-    }
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [loadMoreNews]);
 
-    const data = await fetch(url);
-     this.props.setProgress(30);
-    const passeddata = await data.json();
-    this.props.setProgress(70);
+  return (
+    <div className="container my-2">
+      <h1 className="text-center">
+        NewsLock - Top {category} Headlines
+      </h1>
 
-    console.log(passeddata);
+      {loading && <Spinner />}
 
-    this.setState({
-      articles: append
-        ? [...this.state.articles, ...(passeddata.articles || [])]
-        : passeddata.articles || [],
-      totalResults: passeddata.totalResults || 0,
-      loading: false,
-      loadingMore: false,
-    });
-    this.props.setProgress(100);
-  }
-
-  async componentDidMount() {
-    document.title = `${this.props.category} - NewsLock`;
-
-    await this.updateNews(1);
-
-    window.addEventListener("scroll", this.handleScroll);
-  }
-
-  componentDidUpdate(prevProps) {
-    if (prevProps.category !== this.props.category) {
-      let category = this.props.category;
-
-      category =
-        category.slice(0, 1).toUpperCase() +
-        category.slice(1);
-
-      document.title = `${category} - NewsLock`;
-    }
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener("scroll", this.handleScroll);
-  }
-
-  handleprevclick = () => {
-    let prevPage = this.state.page - 1;
-
-    this.setState({
-      page: prevPage,
-    });
-
-    this.updateNews(prevPage);
-  };
-
-  handlenextclick = () => {
-    let nextPage = this.state.page + 1;
-
-    this.setState({
-      page: nextPage,
-    });
-
-    this.updateNews(nextPage);
-  };
-
-  loadMoreNews = async () => {
-    let nextPage = this.state.page + 1;
-
-    this.setState({
-      page: nextPage,
-      loadingMore: true,
-    });
-
-    await this.updateNews(nextPage, true);
-  };
-
-  render() {
-    let maxPage = Math.ceil(
-      this.state.totalResults / this.state.pageSize
-    );
-
-    return (
-      <div className="container my-2">
-
-        <h1 className="text-center">
-          NewsLock - Top {this.props.category} Headlines
-        </h1>
-
-        {this.state.loading && <Spinner />}
-
-        <div className="row">
-          {!this.state.loading &&
-            this.state.articles.map((element) => {
-              return (
-                <div className="col-md-4" key={element.url}>
-                  <NewsItem
-                    title={element.title?.slice(0, 45)}
-                    description={element.description?.slice(0, 88)}
-                    imageurl={element.urlToImage}
-                    Newsurl={element.url}
-                    author={element.author || "Unknown"}
-                    date={element.publishedAt?.slice(0, 10)}
-                    category={this.props.category}
-                  />
-                </div>
-              );
-            })}
-        </div>
-
-        {this.state.loadingMore && <Spinner />}
-
-        <div className="d-flex justify-content-between mt-3">
-
-
-        </div>
+      <div className="row">
+        {!loading &&
+          articles.map((article) => (
+            <div className="col-md-4" key={article.url} key2={article.url}>
+              <NewsItem
+                title={article.title?.slice(0, 45)}
+                description={article.description?.slice(0, 88)}
+                imageurl={article.urlToImage}
+                Newsurl={article.url}
+                author={article.author || "Unknown"}
+                date={article.publishedAt?.slice(0, 10)}
+                category={category}
+              />
+            </div>
+          ))}
       </div>
-    );
-  }
-  static propTypes = {
+
+      {loadingMore && <Spinner />}
+    </div>
+  );
+};
+
+News.propTypes = {
   country: PropTypes.string,
   pageSize: PropTypes.number,
   category: PropTypes.string,
   setProgress: PropTypes.func,
 };
-}
 
 export default News;
