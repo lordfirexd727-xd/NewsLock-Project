@@ -23,7 +23,7 @@ const Setprogress = (progress: number) => {
   color="#000000"
   progress={props.progress}
 />
-        <News pageSize={pagesize} country="us" category="sports"  setProgress={props.Setprogress}  />
+        <News pageSize={pagesize} country="us" category="genral"  setProgress={props.Setprogress}  />
         
       </div>
     )

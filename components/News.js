@@ -17,6 +17,7 @@ const News = ({
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
+  const [error, setError] = useState("");
 
   const updateNews = useCallback(
     async (pageNo, append = false) => {
@@ -34,7 +35,7 @@ const News = ({
           `&category=${category}` +
           `&page=${pageNo}` +
           `&pageSize=${pageSize}`;
-
+        setError("");
         const response = await fetch(url);
         setProgress?.(30);
 
@@ -65,17 +66,21 @@ const News = ({
         setTotalResults(data.totalResults || 0);
         setPage(pageNo);
       } catch (error) {
-        console.error("News fetch failed:", error);
+  console.error("News fetch failed:", error);
 
-        if (!append) {
-          setArticles([]);
-          setTotalResults(0);
-        }
-      } finally {
-        setLoading(false);
-        setLoadingMore(false);
-        setProgress?.(100);
-      }
+  if (!append) {
+    setArticles([]);
+    setTotalResults(0);
+  }
+
+  setError(
+    "News is temporarily unavailable. Please try again later."
+  );
+} finally {
+  setLoading(false);
+  setLoadingMore(false);
+  setProgress?.(100);
+}
     },
     [country, category, pageSize, setProgress]
   );
@@ -131,6 +136,12 @@ const News = ({
       </h1>
 
       {loading && <Spinner />}
+      {!loading && error && (
+  <div className="alert alert-warning text-center" role="alert">
+    <h5>📰 News temporarily unavailable</h5>
+    <p className="mb-0">{error}</p>
+  </div>
+)}
 
       <div className="row">
         {!loading &&

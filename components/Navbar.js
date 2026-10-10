@@ -5,8 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 const Navbar = () => {
   return (
     <div>
-      <nav className="navbar navbar-expand-lg bg-body-dark">
-        <div className="container-fluid">
+      <nav className="navbar fixed-top navbar-expand-lg bg-dark navbar-dark">        <div className="container-fluid">
           <a className="navbar-brand" href="#">
             NewsLock
           </a>
@@ -30,7 +29,7 @@ const Navbar = () => {
               </li>
               <li className="nav-item">
                 {" "}
-                <a className="nav-link" href="/">
+                <a className="nav-link" href="/About">
                   About
                 </a>
               </li>
