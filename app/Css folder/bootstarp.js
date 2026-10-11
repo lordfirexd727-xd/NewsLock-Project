@@ -3,9 +3,9 @@
 import { useEffect } from "react";
 
 export default function Bootstrap() {
-  useEffect(() => {
-    import("bootstrap/dist/js/bootstrap.bundle.min.js");
-  }, []);
+useEffect(() => {
+import("bootstrap/dist/js/bootstrap.bundle.min.js");
+}, []);
 
-  return null;
+return null;
 }
