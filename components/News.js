@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
@@ -47,48 +46,45 @@ const News = ({
         }
 
         setArticles((previousArticles) => {
-  const newArticles = data.articles || [];
+          const newArticles = data.articles || [];
 
-  if (!append) {
-    return newArticles;
-  }
+          if (!append) {
+            return newArticles;
+          }
 
-  const uniqueArticles = newArticles.filter(
-    (newArticle) =>
-      !previousArticles.some(
-        (oldArticle) => oldArticle.url === newArticle.url
-      )
-  );
+          const uniqueArticles = newArticles.filter(
+            (newArticle) =>
+              !previousArticles.some(
+                (oldArticle) => oldArticle.url === newArticle.url,
+              ),
+          );
 
-  return [...previousArticles, ...uniqueArticles];
-});
+          return [...previousArticles, ...uniqueArticles];
+        });
 
         setTotalResults(data.totalResults || 0);
         setPage(pageNo);
       } catch (error) {
-  console.error("News fetch failed:", error);
+        console.error("News fetch failed:", error);
 
-  if (!append) {
-    setArticles([]);
-    setTotalResults(0);
-  }
+        if (!append) {
+          setArticles([]);
+          setTotalResults(0);
+        }
 
-  setError(
-    "News is temporarily unavailable. Please try again later."
-  );
-} finally {
-  setLoading(false);
-  setLoadingMore(false);
-  setProgress?.(100);
-}
+        setError("News is temporarily unavailable. Please try again later.");
+      } finally {
+        setLoading(false);
+        setLoadingMore(false);
+        setProgress?.(100);
+      }
     },
-    [country, category, pageSize, setProgress]
+    [country, category, pageSize, setProgress],
   );
 
   // Initial load and category changes
   useEffect(() => {
-    document.title =
-      `${category.charAt(0).toUpperCase() + category.slice(1)} - NewsLock`;
+    document.title = `${category.charAt(0).toUpperCase() + category.slice(1)} - NewsLock`;
 
     updateNews(1);
   }, [category, updateNews]);
@@ -101,14 +97,7 @@ const News = ({
     }
 
     await updateNews(page + 1, true);
-  }, [
-    loading,
-    loadingMore,
-    page,
-    totalResults,
-    pageSize,
-    updateNews,
-  ]);
+  }, [loading, loadingMore, page, totalResults, pageSize, updateNews]);
 
   // Infinite scrolling
   useEffect(() => {
@@ -131,17 +120,15 @@ const News = ({
 
   return (
     <div className="container my-2">
-      <h1 className="text-center">
-        NewsLock - Top {category} Headlines
-      </h1>
+      <h1 className="text-center">NewsLock - Top {category} Headlines</h1>
 
       {loading && <Spinner />}
       {!loading && error && (
-  <div className="alert alert-warning text-center" role="alert">
-    <h5>📰 News temporarily unavailable</h5>
-    <p className="mb-0">{error}</p>
-  </div>
-)}
+        <div className="alert alert-warning text-center" role="alert">
+          <h5>📰 News temporarily unavailable</h5>
+          <p className="mb-0">{error}</p>
+        </div>
+      )}
 
       <div className="row">
         {!loading &&
