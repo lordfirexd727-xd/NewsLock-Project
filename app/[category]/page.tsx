@@ -27,7 +27,7 @@ export default function CategoryPage({
 
       <News
         pageSize={9}
-        country="us"
+        country="in"
         category={category}
         setProgress={setProgress}
       />

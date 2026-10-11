@@ -100,23 +100,32 @@ const News = ({
   }, [loading, loadingMore, page, totalResults, pageSize, updateNews]);
 
   // Infinite scrolling
-  useEffect(() => {
-    const handleScroll = () => {
-      const nearBottom =
-        window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - 200;
+useEffect(() => {
+  let waiting = false;
 
-      if (nearBottom) {
-        loadMoreNews();
-      }
-    };
+  const handleScroll = () => {
+    if (waiting) return;
 
-    window.addEventListener("scroll", handleScroll);
+    const nearBottom =
+      window.innerHeight + window.scrollY >=
+      document.documentElement.scrollHeight - 200;
 
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [loadMoreNews]);
+    if (nearBottom) {
+      waiting = true;
+      loadMoreNews();
+
+      setTimeout(() => {
+        waiting = false;
+      }, 1500);
+    }
+  };
+
+  window.addEventListener("scroll", handleScroll, { passive: true });
+
+  return () => {
+    window.removeEventListener("scroll", handleScroll);
+  };
+}, [loadMoreNews]);
 
   return (
     <div className="container my-2">
